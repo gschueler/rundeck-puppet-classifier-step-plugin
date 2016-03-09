@@ -1,0 +1,49 @@
+[
+{
+  "name": "Webservers",
+  "id": "4FB14B84-ACCD-40CB-8719-E77AFC069DB3",
+  "environment": "production",
+  "description": "This group captures configuration relevant to all web-facing production webservers, regardless of location.",
+  "parent": "00000000-0000-4000-8000-000000000000",
+  "rule": ["and", ["~", ["trusted", "certname"], "www"],
+                  [">=", ["fact", "total_ram"], "512"]],
+  "classes": {
+    "apache": {
+      "serveradmin": "bofh@travaglia.net",
+      "keepalive_timeout": "5"
+    }
+  },
+  "variables": {
+    "ntp_servers": ["0.us.pool.ntp.org", "1.us.pool.ntp.org", "2.us.pool.ntp.org"]
+  }
+},
+{
+  "name": "Spaceship",
+  "id": "fc500c43-5065-469b-91fc-37ed0e500e81",
+  "environment": "space",
+  "parent": "00000000-0000-4000-8000-000000000000",
+  "rule": ["=", ["fact", "is_spaceship"], "true"],
+  "classes": {
+    "payload": {
+      "type": "cubesat",
+      "count": "8",
+      "mass": "10.64"
+    },
+    "rocket": {
+      "stages": "3"
+    }
+  },
+  "deleted": {
+    "payload": {"puppetlabs.classifier/deleted": true},
+    "rocket": {
+      "puppetlabs.classifier/deleted": false,
+      "stages": {
+        "puppetlabs.classifier/deleted": true,
+        "value": "3"
+      }
+    }
+  },
+  "variables": {}
+}
+
+]

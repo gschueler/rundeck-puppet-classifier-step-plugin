@@ -1,0 +1,28 @@
+{
+  "name": "Spaceship",
+  "id": "fc500c43-5065-469b-91fc-37ed0e500e81",
+  "environment": "space",
+  "parent": "00000000-0000-4000-8000-000000000000",
+  "rule": ["=", ["fact", "is_spaceship"], "true"],
+  "classes": {
+    "payload": {
+      "type": "cubesat",
+      "count": "8",
+      "mass": "10.64"
+    },
+    "rocket": {
+      "stages": "3"
+    }
+  },
+  "deleted": {
+    "payload": {"puppetlabs.classifier/deleted": true},
+    "rocket": {
+      "puppetlabs.classifier/deleted": false,
+      "stages": {
+        "puppetlabs.classifier/deleted": true,
+        "value": "3"
+      }
+    }
+  },
+  "variables": {}
+}
