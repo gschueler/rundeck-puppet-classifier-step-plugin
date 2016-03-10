@@ -105,7 +105,7 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         }
         context.getLogger().log(
                 2,
-                String.format("Nodes %s pinned to group %s", nodes, groupId)
+                String.format("Nodes %s pinned to group %s (%s)", nodes, group.getName(), groupId)
         );
     }
 
