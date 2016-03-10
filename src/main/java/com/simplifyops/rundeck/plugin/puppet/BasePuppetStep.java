@@ -72,7 +72,7 @@ public abstract class BasePuppetStep {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 resource.getContents().writeContent(byteArrayOutputStream);
                 return new String(byteArrayOutputStream.toByteArray());
-            } catch (IOException | IllegalArgumentException e) {
+            } catch (StorageException | IOException | IllegalArgumentException e) {
                 throw new StepException(
                         String.format("Unable to read authTokenStoragePath %s ", authTokenStoragePath) +
                         e.getLocalizedMessage(),
