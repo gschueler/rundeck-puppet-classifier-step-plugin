@@ -115,14 +115,14 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         );
     }
 
-    private List generateRules(final List<String> nodes) {
+    static List generateRules(final List<String> nodes) {
         ArrayList rules = new ArrayList<>();
         List<String> trusted = asList("trusted", "certname");
 
         for (String node : nodes) {
             rules.add(asList("=", trusted, node));
         }
-        return asList("or", rules);
+        return rules;
     }
 
     void validate() throws StepException {
