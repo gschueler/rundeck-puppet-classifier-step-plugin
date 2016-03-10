@@ -5,6 +5,30 @@ import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
     handlers {
+        path("classifier-api/v1/update-classes") { ctx ->
+            byMethod{m->
+                m.post {
+                    if(request.getHeaders().get("X-Authentication")=='badtoken'){
+                        //simulate authentication failure
+                        response.status(500)
+                        ctx.response.getHeaders().add('Content-Type', 'application/json')
+                        ctx.render(Jackson.json([
+                                kind:'unexpected-response',
+                                msg:'an error ocurred blah blah...',
+                                details:[
+                                        url:'blah',
+                                        status:500,
+                                        headers:[],
+                                        body:'blah'
+                                ]
+                        ]))
+                        return
+                    }
+                    response.status(201)
+
+                }
+            }
+        }
         path("classifier-api/v1/groups/:id") { ctx ->
             byMethod { m ->
 
