@@ -1,9 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectReader
+import ratpack.jackson.Jackson
 
 import static ratpack.groovy.Groovy.ratpack
-import ratpack.server.BaseDir
-import ratpack.jackson.Jackson
 
 ratpack {
     handlers {
@@ -12,6 +10,13 @@ ratpack {
 
                 m.named("get") {
                     println("get request for ${pathTokens.id}")
+                    if(request.getHeaders().get("X-Authentication")=='badtoken'){
+                        //simulate authentication failure
+                        response.status(401)
+                        ctx.response.getHeaders().add('Content-Type', 'application/json')
+                        ctx.render(Jackson.json([message:'unauthenticated']))
+                        return
+                    }
                     ctx.response.getHeaders().add('Content-Type', 'application/json')
                     ctx.render(file("assets/classifier-api/v1/_groups/${pathTokens.id}"))
                 }
@@ -20,6 +25,13 @@ ratpack {
                     ctx.response.getHeaders().add('Content-Type', 'application/json')
 
                     def json = new ObjectMapper()
+                    if(request.getHeaders().get("X-Authentication")=='badtoken2'){
+                        //simulate authentication failure
+                        response.status(401)
+                        ctx.response.getHeaders().add('Content-Type', 'application/json')
+                        ctx.render(Jackson.json([message:'unauthenticated']))
+                        return
+                    }
 
                     if(pathTokens.id=='fc500c43-5065-469b-91fc-37ed0e500e81'){
                         //fake error response
