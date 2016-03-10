@@ -5,26 +5,19 @@ import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.PropertyScope;
-import com.dtolabs.rundeck.core.plugins.configuration.StringRenderingConstants;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.descriptions.PluginDescription;
 import com.dtolabs.rundeck.plugins.descriptions.PluginProperty;
-import com.dtolabs.rundeck.plugins.descriptions.RenderingOption;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.step.StepPlugin;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import com.simplifyops.util.puppet.classifierapi.Group;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -66,18 +59,13 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
     ) throws StepException
     {
         validate();
+
         ClassifierService service = getClassifierService(context);
 
-        List<Group> groups;
-        try {
-            groups = service.listGroups().execute().body();
-        } catch (IOException e) {
-            throw new StepException(
-                    "Failure making API request: " + e.getLocalizedMessage(),
-                    StepFailureReason.IOFailure
-            );
-        }
+        List<Group> groups = performCall(service.listGroups(), "list groups");
+
         context.getLogger().log(4, "filepath: " + filePath);
+
         for (Group group : groups) {
             context.getLogger().log(4, "group: " + group.getName() + "/" + group.getId());
         }

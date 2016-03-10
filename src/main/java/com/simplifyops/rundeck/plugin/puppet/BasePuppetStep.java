@@ -4,17 +4,17 @@ import com.dtolabs.rundeck.core.execution.workflow.steps.FailureReason;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
 import com.dtolabs.rundeck.core.plugins.configuration.PropertyScope;
-import com.dtolabs.rundeck.core.plugins.configuration.StringRenderingConstants;
 import com.dtolabs.rundeck.core.storage.ResourceMeta;
 import com.dtolabs.rundeck.core.storage.StorageTree;
 import com.dtolabs.rundeck.plugins.descriptions.Password;
 import com.dtolabs.rundeck.plugins.descriptions.PluginProperty;
-import com.dtolabs.rundeck.plugins.descriptions.RenderingOption;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import org.rundeck.storage.api.Resource;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import java.io.*;
 
@@ -84,6 +84,35 @@ public abstract class BasePuppetStep {
         }
     }
 
+    <T> T performCall(final Call<T> call, final String name) throws StepException {
+        Response<T> execute = null;
+        try {
+            execute = call.execute();
+            if (!execute.isSuccess()) {
+                String responseBody = execute.errorBody().string();
+                throw new StepException(
+                        String.format(
+                                "%s was not successful: %s: %s",
+                                name,
+                                execute.message(),
+                                responseBody
+                        ),
+                        ApiReason.HTTP_ERROR
+                );
+            }
+        } catch (IOException e) {
+            throw new StepException(
+                    String.format(
+                            "IO error making request for %s: %s",
+                            name,
+                            e.getLocalizedMessage()
+                    ),
+                    StepFailureReason.IOFailure
+            );
+        }
+        return execute.body();
+    }
+
     void validate() throws StepException {
         requireValue(baseUrl, "baseUrl");
         if (null == authToken && null == authTokenFilepath && null == authTokenStoragePath) {
@@ -107,6 +136,7 @@ public abstract class BasePuppetStep {
 
     enum ApiReason implements FailureReason {
         NOT_FOUND,
+        HTTP_ERROR,
         UNKNOWN,
     }
 

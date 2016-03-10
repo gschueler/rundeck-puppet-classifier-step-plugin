@@ -1,7 +1,6 @@
 package com.simplifyops.rundeck.plugin.puppet;
 
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
-import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.descriptions.PluginDescription;
@@ -14,9 +13,7 @@ import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import com.simplifyops.util.puppet.classifierapi.Group;
 import com.simplifyops.util.puppet.classifierapi.UpdateGroupRules;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -65,14 +62,8 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         ClassifierService service = getClassifierService(context);
         Group group;
         context.getLogger().log(3, String.format("Get group %s ...", groupId));
-        try {
-            group = service.getGroup(groupId).execute().body();
-        } catch (IOException e) {
-            throw new StepException(
-                    "Making API request GET group(" + groupId + "): " + e.getLocalizedMessage(),
-                    StepFailureReason.IOFailure
-            );
-        }
+        group = performCall(service.getGroup(groupId), String.format("Get group %s", groupId));
+
         if (null == group) {
             //not found
             throw new StepException(
@@ -91,18 +82,21 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         List rules = generateRules(nodes);
 
         Group postGroup;
-        try {
-            postGroup = service.updateGroup(
-                    groupId,
-                    ClassifierAPI.updateGroupRulesMerge(group, rules, false)
-            ).execute().body();
-        } catch (IOException e) {
-            throw new StepException(
-                    "Making API request POST group(" + groupId + "): " + e.getLocalizedMessage(),
-                    StepFailureReason.IOFailure
-            );
-        }
-        if(null==postGroup){
+
+        UpdateGroupRules updates = ClassifierAPI.updateGroupRulesMerge(group, rules, false);
+
+        context.getLogger().log(
+                3,
+                String.format(
+                        "Original rules: %s ; Updated rules: %s",
+                        group.getRule(),
+                        updates.getRule()
+                )
+        );
+
+
+        postGroup = performCall(service.updateGroup(groupId, updates), String.format("Update group %s", groupId));
+        if (null == postGroup) {
             //post failed
             throw new StepException(
                     String.format("Error POST ing update to group with specified ID: %s", groupId),
