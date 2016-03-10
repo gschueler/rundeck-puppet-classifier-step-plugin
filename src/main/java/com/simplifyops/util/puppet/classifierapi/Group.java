@@ -16,6 +16,15 @@ public class Group {
     private Map classes;
     private Map deleted;
     private Map variables;
+    private boolean environment_trumps;
+
+    public boolean isEnvironment_trumps() {
+        return environment_trumps;
+    }
+
+    public void setEnvironment_trumps(boolean environment_trumps) {
+        this.environment_trumps = environment_trumps;
+    }
 
     public String getName() {
         return name;
