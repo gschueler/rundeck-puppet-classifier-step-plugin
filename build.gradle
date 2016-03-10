@@ -13,7 +13,7 @@ targetCompatibility = 1.7
 
 defaultTasks 'clean', 'build'
 ext.rundeckPluginVersion = '1.1'
-
+ext.exportedClassnames="com.simplifyops.rundeck.plugin.puppet.ClassifierGroupsOptionGeneratorStep,com.simplifyops.rundeck.plugin.puppet.PinNodeToGroupStep"
 scmVersion {
     tag {
         prefix = 'v'
@@ -74,7 +74,7 @@ jar {
                 "Rundeck-Plugin-Version": rundeckPluginVersion,
                 "Rundeck-Plugin-File-Version": version,
                 "Rundeck-Plugin-Archive": "true",
-                "Rundeck-Plugin-Classnames": "com.simplifyops.rundeck.plugin.puppet.ClassifierGroupsOptionGeneratorStep",
+                "Rundeck-Plugin-Classnames": exportedClassnames,
                 "Rundeck-Plugin-Libs": "${libList}"
         )
     }

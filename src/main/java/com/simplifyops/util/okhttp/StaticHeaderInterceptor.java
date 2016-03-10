@@ -1,4 +1,4 @@
-package com.simplifyops.rundeck.plugin.puppet;
+package com.simplifyops.util.okhttp;
 
 import okhttp3.Interceptor;
 import okhttp3.Response;

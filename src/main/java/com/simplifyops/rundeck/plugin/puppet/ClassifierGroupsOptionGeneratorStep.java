@@ -12,6 +12,7 @@ import com.dtolabs.rundeck.plugins.descriptions.PluginProperty;
 import com.dtolabs.rundeck.plugins.descriptions.RenderingOption;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.step.StepPlugin;
+import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
@@ -32,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by greg on 3/9/16.
+ * Generates Job option json from Groups api result list
  */
 @Plugin(name = ClassifierGroupsOptionGeneratorStep.PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
 @PluginDescription(title = "Generate Puppet Classifier Group Options",
                    description = "Generates a Job Options json file from the Puppet Classifier Groups list")
-public class ClassifierGroupsOptionGeneratorStep implements StepPlugin {
+public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implements StepPlugin,
+        DescriptionBuilder.Collaborator
+{
     public static final String PROVIDER_NAME = "puppet-classifier-groups-options-generator-step";
     @PluginProperty(title = "Option Name Template",
                     description = "Template for generating option name from groups.\n\n" +
@@ -55,15 +58,6 @@ public class ClassifierGroupsOptionGeneratorStep implements StepPlugin {
                     description = "Location on disk to create the options file, enter full path and file name.",
                     scope = PropertyScope.Instance)
     String filePath;
-    @PluginProperty(title = "API Base URL",
-                    description = "Puppet Classifier API base URL",
-                    scope = PropertyScope.Project)
-    String baseUrl;
-    @PluginProperty(title = "Auth Token",
-                    description = "Puppet Classifier API auth token",
-                    scope = PropertyScope.Project)
-    @RenderingOption(key = StringRenderingConstants.DISPLAY_TYPE_KEY, value = "PASSWORD")
-    String authToken;
 
 
     @Override
@@ -72,7 +66,7 @@ public class ClassifierGroupsOptionGeneratorStep implements StepPlugin {
     ) throws StepException
     {
         validate();
-        ClassifierService service = ClassifierAPI.getClassifierService(baseUrl, authToken);
+        ClassifierService service = getClassifierService(context);
 
         List<Group> groups;
         try {
@@ -144,19 +138,8 @@ public class ClassifierGroupsOptionGeneratorStep implements StepPlugin {
     }
 
 
-    private void validate() throws StepException {
-        if (null == baseUrl) {
-            throw new StepException(
-                    "Configuration invalid: baseUrl is required",
-                    StepFailureReason.ConfigurationFailure
-            );
-        }
-        if (null == authToken) {
-            throw new StepException(
-                    "Configuration invalid: authToken is not set. Define in project.properties as plugin.x.y.authToken",
-                    StepFailureReason.ConfigurationFailure
-            );
-        }
+    void validate() throws StepException {
+        super.validate();
         if (null == filePath) {
             throw new StepException(
                     "Configuration invalid: filePath is not set.",
@@ -175,5 +158,10 @@ public class ClassifierGroupsOptionGeneratorStep implements StepPlugin {
                     StepFailureReason.ConfigurationFailure
             );
         }
+    }
+
+    @Override
+    public void buildWith(final DescriptionBuilder builder) {
+        super.buildWith(builder);
     }
 }
