@@ -41,6 +41,16 @@ public abstract class BasePuppetStep {
     @PluginProperty(title = "Auth Token Storage Path",
                     description = "Key Storage Path for the Puppet Classifier API auth token",
                     scope = PropertyScope.Project)
+    @RenderingOptions(
+            {
+                    @RenderingOption(key = StringRenderingConstants.SELECTION_ACCESSOR_KEY,
+                                     value = "STORAGE_PATH"),
+                    @RenderingOption(key = StringRenderingConstants.STORAGE_PATH_ROOT_KEY,
+                                     value = "keys"),
+                    @RenderingOption(key = StringRenderingConstants.STORAGE_FILE_META_FILTER_KEY,
+                                     value = "Rundeck-data-type=password")
+            }
+    )
     String authTokenStoragePath;
 
     protected ClassifierService getClassifierService(final PluginStepContext context) throws StepException {
