@@ -31,9 +31,7 @@ import java.util.Map;
 @Plugin(name = ClassifierGroupsOptionGeneratorStep.PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
 @PluginDescription(title = "Generate Puppet Classifier Group Options",
                    description = "Generates a Job Options json file from the Puppet Classifier Groups list")
-public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implements StepPlugin,
-        DescriptionBuilder.Collaborator
-{
+public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implements StepPlugin {
     public static final String PROVIDER_NAME = "puppet-classifier-groups-options-generator-step";
     @PluginProperty(title = "Option Name Template",
                     description = "Template for generating option name from groups.\n\n" +
@@ -85,11 +83,11 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
             );
         }
 
-        context.getLogger().log(2, String.format(
-                "\u001B[32mWrote %d groups to file: %s\u001B[0m",
+        context.getLogger().log(2, ansiColor(String.format(
+                "Wrote %d groups to file: %s",
                 options.size(),
                 filePath
-        ));
+        )));
     }
 
     /*
@@ -153,8 +151,4 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
         }
     }
 
-    @Override
-    public void buildWith(final DescriptionBuilder builder) {
-        super.buildWith(builder);
-    }
 }

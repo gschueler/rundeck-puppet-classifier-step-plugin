@@ -29,7 +29,7 @@ import java.io.*;
 /**
  * Created by greg on 3/9/16.
  */
-public abstract class BasePuppetStep {
+public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator {
     public static final String PUPPET_CLASSIFIER_BASEURL_PROPERTY = "puppet.classifier-api.baseUrl";
     public static final String PUPPET_CLASSIFIER_TOKEN_PROPERTY = "puppet.classifier-api.authToken";
     public static final String PUPPET_CLASSIFIER_TOKEN_FILEPATH_PROPERTY = "puppet.classifier-api.authTokenFilepath";
@@ -200,6 +200,10 @@ public abstract class BasePuppetStep {
                     StepFailureReason.ConfigurationFailure
             );
         }
+    }
+
+    String ansiColor(final String message) {
+        return "\u001B[32m" + message + "\u001B[0m";
     }
 
     enum ApiReason implements FailureReason {

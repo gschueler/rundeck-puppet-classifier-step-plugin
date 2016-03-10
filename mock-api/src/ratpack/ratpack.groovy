@@ -25,7 +25,7 @@ ratpack {
                         return
                     }
                     response.status(201)
-
+                    render('')
                 }
             }
         }
