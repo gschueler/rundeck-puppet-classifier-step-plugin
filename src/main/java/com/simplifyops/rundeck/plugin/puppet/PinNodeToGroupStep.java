@@ -24,8 +24,8 @@ import static java.util.Arrays.asList;
  */
 
 @Plugin(name = PinNodeToGroupStep.PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
-@PluginDescription(title = "Puppet Classifier: Pin Node To Group",
-                   description = "Update a group rule to pin a node to the group")
+@PluginDescription(title = "Pin Nodes To Group",
+                   description = "Puppet Classifier API: Update a group rule to pin a node to the group")
 public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, DescriptionBuilder.Collaborator {
 
     public static final String PROVIDER_NAME = "puppet-classifier-pin-node-to-group-step";
