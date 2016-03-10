@@ -1,5 +1,9 @@
 package com.simplifyops.rundeck.plugin.puppet;
 
+import com.dtolabs.rundeck.core.common.Framework;
+import com.dtolabs.rundeck.core.common.IRundeckProject;
+import com.dtolabs.rundeck.core.common.NodeEntryImpl;
+import com.dtolabs.rundeck.core.execution.utils.ResolverUtil;
 import com.dtolabs.rundeck.core.execution.workflow.steps.FailureReason;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
@@ -28,6 +32,9 @@ import java.io.*;
 public abstract class BasePuppetStep {
     public static final String PUPPET_CLASSIFIER_BASEURL_PROPERTY = "puppet.classifier-api.baseUrl";
     public static final String PUPPET_CLASSIFIER_TOKEN_PROPERTY = "puppet.classifier-api.authToken";
+    public static final String PUPPET_CLASSIFIER_TOKEN_FILEPATH_PROPERTY = "puppet.classifier-api.authTokenFilepath";
+    public static final String PUPPET_CLASSIFIER_TOKEN_STORAGE_PATH_PROPERTY = "puppet.classifier-api" +
+                                                                               ".authTokenStoragePath";
 
     @PluginProperty(title = "API Base URL",
                     description = "Puppet Classifier API base URL",
@@ -98,6 +105,50 @@ public abstract class BasePuppetStep {
         }
     }
 
+    private boolean didLoadMapping = false;
+
+    private void loadViaMapping(final PluginStepContext context) {
+        if (didLoadMapping) {
+            return;
+        }
+        NodeEntryImpl dummy = new NodeEntryImpl();
+        Framework framework = context.getFramework();
+        IRundeckProject project = framework
+                .getFrameworkProjectMgr()
+                .getFrameworkProject(context.getFrameworkProject());
+        baseUrl = ResolverUtil.resolveProperty(
+                PUPPET_CLASSIFIER_BASEURL_PROPERTY,
+                null,
+                dummy,
+                project,
+                framework
+        );
+        authToken = ResolverUtil.resolveProperty(
+                PUPPET_CLASSIFIER_TOKEN_PROPERTY,
+                null,
+                dummy,
+                project,
+                framework
+        );
+        authTokenFilepath = ResolverUtil.resolveProperty(
+                PUPPET_CLASSIFIER_TOKEN_FILEPATH_PROPERTY,
+                null,
+                dummy,
+                project,
+                framework
+        );
+        authTokenStoragePath = ResolverUtil.resolveProperty(
+                PUPPET_CLASSIFIER_TOKEN_STORAGE_PATH_PROPERTY,
+                null,
+                dummy,
+                project,
+                framework
+        );
+
+        didLoadMapping = true;
+
+    }
+
     <T> T performCall(final Call<T> call, final String name) throws StepException {
         Response<T> execute = null;
         try {
@@ -127,7 +178,10 @@ public abstract class BasePuppetStep {
         return execute.body();
     }
 
-    void validate() throws StepException {
+    void validate(final PluginStepContext context) throws StepException {
+        if (null == baseUrl) {
+            loadViaMapping(context);
+        }
         requireValue(baseUrl, "baseUrl");
         if (null == authToken && null == authTokenFilepath && null == authTokenStoragePath) {
             throw new StepException(
@@ -155,9 +209,14 @@ public abstract class BasePuppetStep {
     }
 
     public void buildWith(final DescriptionBuilder builder) {
-        builder.mapping("baseUrl", PUPPET_CLASSIFIER_BASEURL_PROPERTY);
-        builder.frameworkMapping("baseUrl", PUPPET_CLASSIFIER_BASEURL_PROPERTY);
-        builder.mapping("authToken", PUPPET_CLASSIFIER_TOKEN_PROPERTY);
-        builder.frameworkMapping("authToken", PUPPET_CLASSIFIER_TOKEN_PROPERTY);
+        //NB: does not work automatically yet with rundeck, we manually do it via loadViaMapping
+        builder.mapping("baseUrl", "project." + PUPPET_CLASSIFIER_BASEURL_PROPERTY);
+        builder.frameworkMapping("baseUrl", "framework." + PUPPET_CLASSIFIER_BASEURL_PROPERTY);
+        builder.mapping("authToken", "project." + PUPPET_CLASSIFIER_TOKEN_PROPERTY);
+        builder.frameworkMapping("authToken", "framework." + PUPPET_CLASSIFIER_TOKEN_PROPERTY);
+        builder.mapping("authTokenFilepath", "project." + PUPPET_CLASSIFIER_TOKEN_FILEPATH_PROPERTY);
+        builder.frameworkMapping("authTokenFilepath", "framework." + PUPPET_CLASSIFIER_TOKEN_FILEPATH_PROPERTY);
+        builder.mapping("authTokenStoragePath", "project." + PUPPET_CLASSIFIER_TOKEN_STORAGE_PATH_PROPERTY);
+        builder.frameworkMapping("authTokenStoragePath", "framework." + PUPPET_CLASSIFIER_TOKEN_STORAGE_PATH_PROPERTY);
     }
 }

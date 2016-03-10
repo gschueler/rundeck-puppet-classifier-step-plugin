@@ -58,7 +58,7 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
             final PluginStepContext context, final Map<String, Object> configuration
     ) throws StepException
     {
-        validate();
+        validate(context);
 
         ClassifierService service = getClassifierService(context);
 
@@ -126,8 +126,8 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
     }
 
 
-    void validate() throws StepException {
-        super.validate();
+    void validate(final PluginStepContext context) throws StepException {
+        super.validate(context);
         if (null == filePath) {
             throw new StepException(
                     "Configuration invalid: filePath is not set.",

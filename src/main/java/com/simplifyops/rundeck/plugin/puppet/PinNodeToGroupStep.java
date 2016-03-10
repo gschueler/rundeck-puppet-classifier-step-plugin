@@ -58,7 +58,7 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
             final PluginStepContext context, final Map<String, Object> configuration
     ) throws StepException
     {
-        validate();
+        validate(context);
         ClassifierService service = getClassifierService(context);
         Group group;
         context.getLogger().log(3, String.format("Get group %s ...", groupId));
@@ -119,8 +119,8 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         return rules;
     }
 
-    void validate() throws StepException {
-        super.validate();
+    void validate(final PluginStepContext context) throws StepException {
+        super.validate(context);
         requireValue(groupId, "groupId");
 
     }
