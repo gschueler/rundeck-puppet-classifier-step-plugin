@@ -1,0 +1,40 @@
+{
+    "name": "RedHat Linux Servers",
+    "id": "a44f2ceb-018e-4f6a-a61c-40f8984c7406",
+    "parent": "00000000-0000-4000-8000-000000000000",
+    "environment": "production",
+    "rule": [
+        "or",
+        [
+            "and",
+            [
+                "=",
+                [
+                    "fact",
+                    "osfamily"
+                ],
+                "RedHat"
+            ],
+            [
+                "=",
+                [
+                    "fact",
+                    "kernel"
+                ],
+                "Linux"
+            ]
+        ],
+        [
+            "=",
+            "name",
+            "ubuntu1404b.syd.puppetlabs.demo"
+        ],
+        [
+            "=",
+            "name",
+            "ubuntu1404a.pdx.puppetlabs.demo"
+        ]
+    ],
+    "classes": {},
+    "variables": {}
+}
