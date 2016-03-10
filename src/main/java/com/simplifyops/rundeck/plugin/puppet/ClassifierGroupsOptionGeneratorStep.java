@@ -85,6 +85,11 @@ public class ClassifierGroupsOptionGeneratorStep extends BasePuppetStep implemen
             );
         }
 
+        context.getLogger().log(2, String.format(
+                "\u001B[32mWrote %d groups to file: %s\u001B[0m",
+                options.size(),
+                filePath
+        ));
     }
 
     /*
