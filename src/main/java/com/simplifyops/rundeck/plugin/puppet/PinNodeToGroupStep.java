@@ -114,7 +114,7 @@ public class PinNodeToGroupStep extends BasePuppetStep implements StepPlugin, De
         List<String> trusted = asList("trusted", "certname");
 
         for (String node : nodes) {
-            rules.add(asList("=", trusted, node));
+            rules.add(asList("=", "name", node));
         }
         return rules;
     }

@@ -15,9 +15,9 @@ class PinNodeToGroupStepSpec extends Specification {
 
         then:
         result == [
-                ["=",["trusted","certname"],"a"],
-                ["=",["trusted","certname"],"b"],
-                ["=",["trusted","certname"],"c"],
+                ["=", "name", "a"],
+                ["=", "name", "b"],
+                ["=", "name", "c"],
         ]
     }
 }

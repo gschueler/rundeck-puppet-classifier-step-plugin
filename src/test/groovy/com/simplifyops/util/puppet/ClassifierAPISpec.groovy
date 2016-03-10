@@ -9,7 +9,7 @@ import spock.lang.Specification
 class ClassifierAPISpec extends Specification {
     def "create update group rule"() {
         given:
-        def rules = ["=", ["trusted", "certname"], "mynode"]
+        def rules = ["=", "name", "mynode"]
         when:
         def result = ClassifierAPI.updateGroupRules(rules)
 
@@ -19,17 +19,17 @@ class ClassifierAPISpec extends Specification {
 
     def "merge update group rule op"() {
         given:
-        def rules = ["=", ["trusted", "certname"], "mynode"]
+        def rules = ["=", "name", "mynode"]
         def group = new Group()
-        group.rule = ["=", ["trusted", "certname"], "othernode"]
+        group.rule = ["=", "name", "othernode"]
 
         when:
         def result = ClassifierAPI.updateGroupRulesMerge(group, rules, oper == "and")
 
         then:
         result.rule == [oper,
-                        ["=", ["trusted", "certname"], "othernode"],
-                        ["=", ["trusted", "certname"], "mynode"]
+                        ["=", "name", "othernode"],
+                        ["=", "name", "mynode"]
         ]
 
         where:
@@ -40,20 +40,20 @@ class ClassifierAPISpec extends Specification {
 
     def "merge update group rule existing op"() {
         given:
-        def rules = ["=", ["trusted", "certname"], "mynode"]
+        def rules = [["=", "name", "mynode"]]
         def group = new Group()
         group.rule = [oper,
-                      ["=", ["trusted", "certname"], "othernode"],
-                      ["=", ["trusted", "certname"], "othernode2"]
+                      ["=", "name", "othernode"],
+                      ["=", "name", "othernode2"]
         ]
         when:
         def result = ClassifierAPI.updateGroupRulesMerge(group, rules, oper == "and")
 
         then:
         result.rule == [oper,
-                        ["=", ["trusted", "certname"], "othernode"],
-                        ["=", ["trusted", "certname"], "othernode2"],
-                        ["=", ["trusted", "certname"], "mynode"]
+                        ["=", "name", "othernode"],
+                        ["=", "name", "othernode2"],
+                        ["=", "name", "mynode"]
         ]
 
         where:
@@ -64,7 +64,7 @@ class ClassifierAPISpec extends Specification {
 
     def "merge update group rule data"() {
         given:
-        def rules = ["=", ["trusted", "certname"], "mynode"]
+        def rules = [["=", "name", "mynode"]]
         def group = new Group()
         group.rule = ["or",
                       [
@@ -131,7 +131,7 @@ class ClassifierAPISpec extends Specification {
                                 "name",
                                 "ubuntu1404a.pdx.puppetlabs.demo"
                         ],
-                        ["=", ["trusted", "certname"], "mynode"]
+                        ["=", "name", "mynode"]
         ]
 
     }

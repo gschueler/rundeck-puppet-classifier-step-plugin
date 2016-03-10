@@ -63,7 +63,7 @@ public class ClassifierAPI {
                 //add to existing top level operator
                 newrules = new ArrayList(Arrays.asList(op));
                 newrules.addAll(originalRule.subList(1, originalRule.size()));
-                newrules.add(updateRules);
+                newrules.addAll(updateRules);
             } else {
                 newrules = Arrays.asList(
                         op,
