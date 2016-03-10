@@ -16,6 +16,7 @@ import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import org.rundeck.storage.api.Resource;
+import org.rundeck.storage.api.StorageException;
 import retrofit2.Call;
 import retrofit2.Response;
 
