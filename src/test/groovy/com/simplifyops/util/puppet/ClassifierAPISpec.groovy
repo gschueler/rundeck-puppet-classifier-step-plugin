@@ -62,6 +62,110 @@ class ClassifierAPISpec extends Specification {
         "or"  | _
     }
 
+    def "update group rule remove nodes no change"() {
+        given:
+        def nodes = ["anode", "bnode"]
+        def group = new Group()
+        group.rule = ["or",
+                      ["=", "name", "othernode"],
+                      ["=", "name", "othernode2"]
+        ]
+        when:
+        def result = ClassifierAPI.updateGroupRulesRemoveNodes(group, nodes)
+
+        then:
+        result == null
+
+    }
+
+    def "update group rule remove nodes"() {
+        given:
+        def group = new Group()
+        group.rule = ["or"] + orig.collect { ["=", "name", it] }
+
+        when:
+        def result = ClassifierAPI.updateGroupRulesRemoveNodes(group, nodes)
+
+        then:
+        result != null
+        result.rule == ["or"] + expected.collect { ["=", "name", it] }
+        where:
+        orig               | nodes                           | expected
+        ["anode", "bnode"] | ["anode", "bnode", "othernode"] | []
+        ["anode", "bnode"] | ["anode"]                       | ["bnode"]
+        ["anode", "bnode"] | ["anode", "bnode"]              | []
+
+    }
+
+
+    def "update group rule remove nodes complex"() {
+        given:
+        def nodes = ["ubuntu1404b.syd.puppetlabs.demo"]
+        def group = new Group()
+        group.rule = ["or",
+                      [
+                              "and",
+                              [
+                                      "=",
+                                      [
+                                              "fact",
+                                              "osfamily"
+                                      ],
+                                      "RedHat"
+                              ],
+                              [
+                                      "=",
+                                      [
+                                              "fact",
+                                              "kernel"
+                                      ],
+                                      "Linux"
+                              ]
+                      ],
+                      [
+                              "=",
+                              "name",
+                              "ubuntu1404b.syd.puppetlabs.demo"
+                      ],
+                      [
+                              "=",
+                              "name",
+                              "ubuntu1404a.pdx.puppetlabs.demo"
+                      ]
+        ]
+        when:
+        def result = ClassifierAPI.updateGroupRulesRemoveNodes(group, nodes)
+
+        then:
+        result != null
+        result.rule == ["or",
+                        [
+                                "and",
+                                [
+                                        "=",
+                                        [
+                                                "fact",
+                                                "osfamily"
+                                        ],
+                                        "RedHat"
+                                ],
+                                [
+                                        "=",
+                                        [
+                                                "fact",
+                                                "kernel"
+                                        ],
+                                        "Linux"
+                                ]
+                        ],
+                        [
+                                "=",
+                                "name",
+                                "ubuntu1404a.pdx.puppetlabs.demo"
+                        ]
+        ]
+    }
+
     def "merge update group rule data"() {
         given:
         def rules = [["=", "name", "mynode"]]

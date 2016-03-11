@@ -95,4 +95,49 @@ public class ClassifierAPI {
         updateGroupRules.setRule(newrules);
         return updateGroupRules;
     }
+
+    /**
+     * Create update request body for updating group rules
+     *
+     * @param group original group with optional rule
+     * @param nodes nodes to remove
+     *
+     * @return
+     */
+    public static UpdateGroupRules updateGroupRulesRemoveNodes(Group group, List<String> nodes) {
+        List newrules = new ArrayList();
+        List originalRule = group.getRule();
+        final String op = "or";
+        boolean changed = false;
+        if (null != originalRule && !originalRule.isEmpty()) {
+            if (op.equals(originalRule.get(0))) {
+                //iterate through rules... if they match [=,name,<node>], don' add it
+                newrules.add(op);
+                for (Object o : originalRule.subList(1, originalRule.size())) {
+                    if (o instanceof List) {
+                        List orule = (List) o;
+                        if (orule.size() == 3) {
+                            if (
+                                    "=".equals(orule.get(0))
+                                    && "name".equals(orule.get(1))
+                                    && nodes.contains(orule.get(2))
+                                    ) {
+                                //remove this rule by skipping
+                                changed = true;
+                                continue;
+                            }
+                        }
+                    }
+                    //if not a match, keep the rule
+                    newrules.add(o);
+                }
+            }
+        }
+        if (!changed) {
+            return null;
+        }
+        UpdateGroupRules updateGroupRules = new UpdateGroupRules();
+        updateGroupRules.setRule(newrules);
+        return updateGroupRules;
+    }
 }

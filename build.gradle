@@ -13,7 +13,7 @@ targetCompatibility = 1.7
 
 defaultTasks 'clean', 'build'
 ext.rundeckPluginVersion = '1.1'
-ext.exportedClassnames="com.simplifyops.rundeck.plugin.puppet.ClassifierGroupsOptionGeneratorStep,com.simplifyops.rundeck.plugin.puppet.PinNodeToGroupStep"
+ext.exportedClassnames="com.simplifyops.rundeck.plugin.puppet.ClassifierGroupsOptionGeneratorStep,com.simplifyops.rundeck.plugin.puppet.PinNodeToGroupStep,com.simplifyops.rundeck.plugin.puppet.RemoveNodeFromGroupStep"
 scmVersion {
     tag {
         prefix = 'v'
