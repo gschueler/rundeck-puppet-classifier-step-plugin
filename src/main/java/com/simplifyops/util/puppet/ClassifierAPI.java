@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -40,7 +41,18 @@ public class ClassifierAPI {
                 ErrorResponse.class,
                 new Annotation[0]
         );
-        return errorConverter.convert(execute.errorBody());
+        if (execute.headers().get("Content-type").contains("application/json")) {
+            return errorConverter.convert(execute.errorBody());
+        } else {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setKind("unknown");
+            errorResponse.setMsg("Unknown error response");
+            HashMap details = new HashMap();
+            details.put("response", execute.errorBody().string());
+            errorResponse.setDetails(details);
+
+            return errorResponse;
+        }
     }
 
     public ClassifierService getClassifierService() {
@@ -63,8 +75,9 @@ public class ClassifierAPI {
     /**
      * Create update request body for updating group rules
      *
-     * @param group        original group with optional rule
-     * @param updateRules  new rules
+     * @param group       original group with optional rule
+     * @param updateRules new rules
+     *
      * @return
      */
     public static UpdateGroupRules updateGroupRulesMerge(Group group, List updateRules) {

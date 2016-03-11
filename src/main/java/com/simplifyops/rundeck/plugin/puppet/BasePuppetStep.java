@@ -181,6 +181,7 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
                             name,
                             e.getLocalizedMessage()
                     ),
+                    e,
                     StepFailureReason.IOFailure
             );
         }
