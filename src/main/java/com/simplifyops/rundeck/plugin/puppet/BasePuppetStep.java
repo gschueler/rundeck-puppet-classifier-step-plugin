@@ -19,12 +19,16 @@ import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
+import com.simplifyops.util.puppet.classifierapi.ErrorResponse;
+import okhttp3.ResponseBody;
 import org.rundeck.storage.api.Resource;
 import org.rundeck.storage.api.StorageException;
 import retrofit2.Call;
+import retrofit2.Converter;
 import retrofit2.Response;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
 
 /**
  * Created by greg on 3/9/16.
@@ -64,8 +68,11 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
     )
     String authTokenStoragePath;
 
+    private ClassifierAPI api;
+
     protected ClassifierService getClassifierService(final PluginStepContext context) throws StepException {
-        return ClassifierAPI.getClassifierService(baseUrl, resolveAuthToken(context));
+        this.api = new ClassifierAPI(baseUrl, resolveAuthToken(context));
+        return api.getClassifierService();
     }
 
     protected String resolveAuthToken(final PluginStepContext context) throws StepException {
@@ -154,13 +161,15 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
         try {
             execute = call.execute();
             if (!execute.isSuccess()) {
-                String responseBody = execute.errorBody().string();
+                ErrorResponse error = api.readError(execute);
+                // Look up a converter for the Error type on the Retrofit instance.
+                // Convert the error body into our Error type.
                 throw new StepException(
                         String.format(
                                 "%s was not successful: %s: %s",
                                 name,
                                 execute.message(),
-                                responseBody
+                                error
                         ),
                         ApiReason.HTTP_ERROR
                 );

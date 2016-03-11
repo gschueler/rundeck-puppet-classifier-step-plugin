@@ -1,14 +1,17 @@
 package com.simplifyops.util.puppet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplifyops.util.okhttp.StaticHeaderInterceptor;
-import com.simplifyops.util.puppet.classifierapi.ClassifierService;
-import com.simplifyops.util.puppet.classifierapi.Group;
-import com.simplifyops.util.puppet.classifierapi.UpdateGroup;
-import com.simplifyops.util.puppet.classifierapi.UpdateGroupRules;
+import com.simplifyops.util.puppet.classifierapi.*;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,8 +21,10 @@ import java.util.List;
  * Created by greg on 3/9/16.
  */
 public class ClassifierAPI {
-    public static ClassifierService getClassifierService(final String baseUrl, final String authToken) {
-        Retrofit retrofit = new Retrofit.Builder()
+    final Retrofit retrofit;
+
+    public ClassifierAPI(final String baseUrl, final String authToken) {
+        this.retrofit = new Retrofit.Builder()
                 .callFactory(new OkHttpClient.Builder().addInterceptor(
                         new StaticHeaderInterceptor(
                                 "X-Authentication",
@@ -29,6 +34,18 @@ public class ClassifierAPI {
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 
+    }
+
+    public ErrorResponse readError(Response<?> execute) throws IOException {
+
+        Converter<ResponseBody, ErrorResponse> errorConverter = retrofit.responseBodyConverter(
+                ErrorResponse.class,
+                new Annotation[0]
+        );
+        return errorConverter.convert(execute.errorBody());
+    }
+
+    public ClassifierService getClassifierService() {
         return retrofit.create(ClassifierService.class);
     }
 
