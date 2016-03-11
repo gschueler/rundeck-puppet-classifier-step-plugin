@@ -17,49 +17,39 @@ class ClassifierAPISpec extends Specification {
         result.rule == rules
     }
 
-    def "merge update group rule op"() {
-        given:
-        def rules = ["=", "name", "mynode"]
-        def group = new Group()
-        group.rule = ["=", "name", "othernode"]
-
-        when:
-        def result = ClassifierAPI.updateGroupRulesMerge(group, rules, oper == "and")
-
-        then:
-        result.rule == [oper,
-                        ["=", "name", "othernode"],
-                        ["=", "name", "mynode"]
-        ]
-
-        where:
-        oper  | _
-        "and" | _
-        "or"  | _
-    }
-
     def "merge update group rule existing op"() {
         given:
         def rules = [["=", "name", "mynode"]]
         def group = new Group()
-        group.rule = [oper,
+        group.rule = ["or",
                       ["=", "name", "othernode"],
                       ["=", "name", "othernode2"]
         ]
         when:
-        def result = ClassifierAPI.updateGroupRulesMerge(group, rules, oper == "and")
+        def result = ClassifierAPI.updateGroupRulesMerge(group, rules)
 
         then:
-        result.rule == [oper,
+        result.rule == ["or",
                         ["=", "name", "othernode"],
                         ["=", "name", "othernode2"],
                         ["=", "name", "mynode"]
         ]
 
-        where:
-        oper  | _
-        "and" | _
-        "or"  | _
+    }
+
+    def "merge update group rule no existing rules"() {
+        given:
+        def rules = [["=", "name", "mynode"]]
+        def group = new Group()
+        group.rule = []
+        when:
+        def result = ClassifierAPI.updateGroupRulesMerge(group, rules)
+
+        then:
+        result.rule == ["or",
+                        ["=", "name", "mynode"]
+        ]
+
     }
 
     def "update group rule remove nodes no change"() {
@@ -88,7 +78,7 @@ class ClassifierAPISpec extends Specification {
 
         then:
         result != null
-        result.rule == ["or"] + expected.collect { ["=", "name", it] }
+        result.rule == (expected ? ["or"] + expected.collect { ["=", "name", it] } : [])
         where:
         orig               | nodes                           | expected
         ["anode", "bnode"] | ["anode", "bnode", "othernode"] | []
@@ -202,7 +192,7 @@ class ClassifierAPISpec extends Specification {
                       ]
         ]
         when:
-        def result = ClassifierAPI.updateGroupRulesMerge(group, rules, false)
+        def result = ClassifierAPI.updateGroupRulesMerge(group, rules)
 
         then:
         result.rule == ["or",

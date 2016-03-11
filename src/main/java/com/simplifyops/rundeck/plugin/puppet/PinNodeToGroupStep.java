@@ -4,10 +4,8 @@ import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.descriptions.PluginDescription;
-import com.dtolabs.rundeck.plugins.descriptions.PluginProperty;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.step.StepPlugin;
-import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import com.simplifyops.util.puppet.classifierapi.Group;
@@ -16,8 +14,6 @@ import com.simplifyops.util.puppet.classifierapi.UpdateGroupRules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 /**
  * Created by greg on 3/9/16.
@@ -50,7 +46,7 @@ public class PinNodeToGroupStep extends BaseNodeGroupStep implements StepPlugin 
 
         Group postGroup;
 
-        UpdateGroupRules updates = ClassifierAPI.updateGroupRulesMerge(group, rules, false);
+        UpdateGroupRules updates = ClassifierAPI.updateGroupRulesMerge(group, rules);
 
         context.getLogger().log(
                 3,

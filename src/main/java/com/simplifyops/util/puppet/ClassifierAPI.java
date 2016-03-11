@@ -1,6 +1,5 @@
 package com.simplifyops.util.puppet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplifyops.util.okhttp.StaticHeaderInterceptor;
 import com.simplifyops.util.puppet.classifierapi.*;
 import okhttp3.OkHttpClient;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,14 +65,12 @@ public class ClassifierAPI {
      *
      * @param group        original group with optional rule
      * @param updateRules  new rules
-     * @param andOperation use "and" to add the new rules, otherwise use "or"
-     *
      * @return
      */
-    public static UpdateGroupRules updateGroupRulesMerge(Group group, List updateRules, boolean andOperation) {
+    public static UpdateGroupRules updateGroupRulesMerge(Group group, List updateRules) {
         List newrules;
         List originalRule = group.getRule();
-        final String op = andOperation ? "and" : "or";
+        final String op = "or";
         if (null != originalRule && !originalRule.isEmpty()) {
             if (op.equals(originalRule.get(0))) {
                 //add to existing top level operator
@@ -89,7 +85,8 @@ public class ClassifierAPI {
                 );
             }
         } else {
-            newrules = updateRules;
+            newrules = new ArrayList(Arrays.asList(op));
+            newrules.addAll(updateRules);
         }
         UpdateGroupRules updateGroupRules = new UpdateGroupRules();
         updateGroupRules.setRule(newrules);
@@ -135,6 +132,9 @@ public class ClassifierAPI {
         }
         if (!changed) {
             return null;
+        }
+        if (newrules.size() == 1 && "or".equals(newrules.get(0))) {
+            newrules.clear();//empty
         }
         UpdateGroupRules updateGroupRules = new UpdateGroupRules();
         updateGroupRules.setRule(newrules);
