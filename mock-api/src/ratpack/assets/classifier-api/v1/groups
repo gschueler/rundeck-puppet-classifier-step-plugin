@@ -46,6 +46,56 @@
   "variables": {}
 },
 {
+  "name": "Zoo Animals",
+  "id": "dc500c43-5065-469b-91fc-37ed0e500e81",
+  "environment": "space",
+  "parent": "00000000-0000-4000-8000-000000000000",
+  "rule": ["or",
+  ["=", ["fact", "is_spaceship"], "true"],
+                                                               [
+                                                                   "=",
+                                                                   "name",
+                                                                   "monkeytest1.blah.com"
+                                                               ],
+                                                               [
+                                                                   "=",
+                                                                   "name",
+                                                                   "monkeytest2.blah.com"
+                                                               ],
+                                                               [
+                                                                   "=",
+                                                                   "name",
+                                                                   "monkeytest3.blah.com"
+                                                               ],
+                                                               [
+                                                                   "=",
+                                                                   "name",
+                                                                   "monkeytest4.blah.com"
+                                                               ]
+   ],
+  "classes": {
+    "payload": {
+      "type": "cubesat",
+      "count": "8",
+      "mass": "10.64"
+    },
+    "rocket": {
+      "stages": "3"
+    }
+  },
+  "deleted": {
+    "payload": {"puppetlabs.classifier/deleted": true},
+    "rocket": {
+      "puppetlabs.classifier/deleted": false,
+      "stages": {
+        "puppetlabs.classifier/deleted": true,
+        "value": "3"
+      }
+    }
+  },
+  "variables": {}
+},
+{
     "name": "RedHat Linux Servers",
     "id": "a44f2ceb-018e-4f6a-a61c-40f8984c7406",
     "parent": "00000000-0000-4000-8000-000000000000",

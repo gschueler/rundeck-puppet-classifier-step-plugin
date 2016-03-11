@@ -7,6 +7,7 @@ import com.dtolabs.rundeck.core.execution.utils.ResolverUtil;
 import com.dtolabs.rundeck.core.execution.workflow.steps.FailureReason;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
+import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
 import com.dtolabs.rundeck.core.plugins.configuration.PropertyScope;
 import com.dtolabs.rundeck.core.plugins.configuration.StringRenderingConstants;
 import com.dtolabs.rundeck.core.storage.ResourceMeta;
@@ -68,11 +69,29 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
     private ClassifierAPI api;
 
     protected ClassifierService getClassifierService(final PluginStepContext context) throws StepException {
-        this.api = new ClassifierAPI(baseUrl, resolveAuthToken(context));
+        String authToken = null;
+        try {
+            authToken = resolveAuthToken(
+                    context.getExecutionContext().getStorageTree(),
+                    this.authToken,
+                    authTokenFilepath,
+                    authTokenStoragePath
+            );
+        } catch (ConfigurationException e) {
+            throw new StepException(e.getMessage(), e, StepFailureReason.ConfigurationFailure);
+        }
+        if (authToken == null) {
+            throw new StepException("authToken is required", StepFailureReason.ConfigurationFailure);
+        }
+        this.api = new ClassifierAPI(baseUrl, authToken);
         return api.getClassifierService();
     }
 
-    protected String resolveAuthToken(final PluginStepContext context) throws StepException {
+    protected String resolveAuthToken(
+            final StorageTree storageTree,
+            final String authToken, final String authTokenFilepath, final String authTokenStoragePath
+    ) throws ConfigurationException
+    {
         if (null != authToken) {
             return authToken;
         } else if (null != authTokenFilepath) {
@@ -83,29 +102,28 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
                     return inputStreamReader.readLine();
                 }
             } catch (IOException e) {
-                throw new StepException(
+                throw new ConfigurationException(
                         String.format("Unable to read authTokenFilepath file %s ", authTokenFilepath) +
                         e.getLocalizedMessage(),
-                        StepFailureReason.ConfigurationFailure
+                        e
                 );
             }
         } else if (null != authTokenStoragePath) {
             //try to read from key storage
-            StorageTree storageTree = context.getExecutionContext().getStorageTree();
             try {
                 Resource<ResourceMeta> resource = storageTree.getResource(authTokenStoragePath);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 resource.getContents().writeContent(byteArrayOutputStream);
                 return new String(byteArrayOutputStream.toByteArray());
             } catch (StorageException | IOException | IllegalArgumentException e) {
-                throw new StepException(
+                throw new ConfigurationException(
                         String.format("Unable to read authTokenStoragePath %s ", authTokenStoragePath) +
                         e.getLocalizedMessage(),
-                        StepFailureReason.ConfigurationFailure
+                        e
                 );
             }
         } else {
-            throw new StepException("authToken is required", StepFailureReason.ConfigurationFailure);
+            return null;
         }
     }
 
