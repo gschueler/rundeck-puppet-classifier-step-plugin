@@ -40,7 +40,7 @@ ratpack {
                         //simulate authentication failure
                         response.status(401)
                         ctx.response.getHeaders().add('Content-Type', 'application/json')
-                        ctx.render(Jackson.json([message: 'unauthenticated']))
+                        ctx.render(Jackson.json([msg: 'unauthorized']))
                         return
                     }
                     ctx.response.getHeaders().add('Content-Type', 'application/json')

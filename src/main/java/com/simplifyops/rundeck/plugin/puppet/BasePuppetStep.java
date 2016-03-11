@@ -20,15 +20,12 @@ import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.simplifyops.util.puppet.ClassifierAPI;
 import com.simplifyops.util.puppet.classifierapi.ClassifierService;
 import com.simplifyops.util.puppet.classifierapi.ErrorResponse;
-import okhttp3.ResponseBody;
 import org.rundeck.storage.api.Resource;
 import org.rundeck.storage.api.StorageException;
 import retrofit2.Call;
-import retrofit2.Converter;
 import retrofit2.Response;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
 
 /**
  * Created by greg on 3/9/16.
@@ -161,17 +158,19 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
         try {
             execute = call.execute();
             if (!execute.isSuccess()) {
+                boolean unauth = execute.code() == 401;
+
                 ErrorResponse error = api.readError(execute);
-                // Look up a converter for the Error type on the Retrofit instance.
-                // Convert the error body into our Error type.
+
                 throw new StepException(
                         String.format(
-                                "%s was not successful: %s: %s",
+                                "%s was not %s: %s: %s",
                                 name,
+                                unauth ? "authorized" : "successful",
                                 execute.message(),
                                 error
                         ),
-                        ApiReason.HTTP_ERROR
+                        unauth ? ApiReason.API_UNAUTHORIZED : ApiReason.API_ERROR
                 );
             }
         } catch (IOException e) {
@@ -217,8 +216,9 @@ public abstract class BasePuppetStep implements DescriptionBuilder.Collaborator 
     }
 
     enum ApiReason implements FailureReason {
-        NOT_FOUND,
-        HTTP_ERROR,
+        API_NOT_FOUND,
+        API_UNAUTHORIZED,
+        API_ERROR,
         UNKNOWN,
     }
 

@@ -70,7 +70,7 @@ public class BaseNodeGroupStep extends BasePuppetStep {
             //not found
             throw new StepException(
                     String.format("Group with specified ID was not found: %s", groupId),
-                    ApiReason.NOT_FOUND
+                    ApiReason.API_NOT_FOUND
             );
         }
         context.getLogger().log(3, String.format("Get group %s result: %s", groupId, group));
