@@ -67,11 +67,11 @@ public class PinnedNodeGroupsResourceModelSource extends BasePuppetStep implemen
         NodeSetImpl iNodeEntries = new NodeSetImpl();
         for (Group group : body) {
             List rules = group.getRule();
-            if (rules.size() > 1 && "or".equals(rules.get(0))) {
+            if (null != rules && rules.size() > 1 && "or".equals(rules.get(0))) {
                 //look for pinned node rules
                 for (Object o : rules.subList(1, rules.size())) {
-                    if(o instanceof List){
-                        List rule=(List) o;
+                    if (o instanceof List) {
+                        List rule = (List) o;
                         if (rule.size() == 3 && "=".equals(rule.get(0)) && "name".equals(rule.get(1))) {
                             addNodeTag((String) rule.get(2), iNodeEntries, group.getName());
                         }
