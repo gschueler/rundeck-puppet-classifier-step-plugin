@@ -6,22 +6,24 @@ import static ratpack.groovy.Groovy.ratpack
 ratpack {
     handlers {
         path("classifier-api/v1/update-classes") { ctx ->
-            byMethod{m->
+            byMethod { m ->
                 m.post {
-                    if(request.getHeaders().get("X-Authentication")=='badtoken'){
+                    if (request.getHeaders().get("X-Authentication") == 'badtoken') {
                         //simulate authentication failure
                         response.status(500)
                         ctx.response.getHeaders().add('Content-Type', 'application/json')
                         ctx.render(Jackson.json([
-                                kind:'unexpected-response',
-                                msg:'an error ocurred blah blah...',
-                                details:[
-                                        url:'blah',
-                                        status:500,
-                                        headers:[],
-                                        body:'blah'
+                                kind   : 'unexpected-response',
+                                msg    : 'an error ocurred blah blah...',
+                                details: [
+                                        url    : 'blah',
+                                        status : 500,
+                                        headers: [],
+                                        body   : 'blah'
                                 ]
-                        ]))
+                        ]
+                        )
+                        )
                         return
                     }
                     response.status(201)
@@ -34,11 +36,11 @@ ratpack {
 
                 m.named("get") {
                     println("get request for ${pathTokens.id}")
-                    if(request.getHeaders().get("X-Authentication")=='badtoken'){
+                    if (request.getHeaders().get("X-Authentication") == 'badtoken') {
                         //simulate authentication failure
                         response.status(401)
                         ctx.response.getHeaders().add('Content-Type', 'application/json')
-                        ctx.render(Jackson.json([message:'unauthenticated']))
+                        ctx.render(Jackson.json([message: 'unauthenticated']))
                         return
                     }
                     ctx.response.getHeaders().add('Content-Type', 'application/json')
@@ -49,27 +51,29 @@ ratpack {
                     ctx.response.getHeaders().add('Content-Type', 'application/json')
 
                     def json = new ObjectMapper()
-                    if(request.getHeaders().get("X-Authentication")=='badtoken2'){
+                    if (request.getHeaders().get("X-Authentication") == 'badtoken2') {
                         //simulate authentication failure
                         response.status(401)
                         ctx.response.getHeaders().add('Content-Type', 'application/json')
-                        ctx.render(Jackson.json([message:'unauthenticated']))
+                        ctx.render(Jackson.json([message: 'unauthenticated']))
                         return
                     }
 
-                    if(pathTokens.id=='fc500c43-5065-469b-91fc-37ed0e500e81'){
+                    if (pathTokens.id == 'fc500c43-5065-469b-91fc-37ed0e500e81') {
                         //fake error response
                         ctx.response.status(400)
                         ctx.render(Jackson.json(
                                 [
-                                        "kind":"conflicting-ids",
-                                        "details":[
-                                                submitted:'fc500c43-5065-469b-91fc-37ed0e500e81',
-                                                fromUrl:'fc500c43-5065-469b-91fc-37ed0e500e81'
+                                        "kind"   : "conflicting-ids",
+                                        "msg"      : "monkey business",
+                                        "details": [
+                                                submitted: 'fc500c43-5065-469b-91fc-37ed0e500e81',
+                                                fromUrl  : 'fc500c43-5065-469b-91fc-37ed0e500e81'
                                         ]
                                 ]
-                        ))
-                    }else {
+                        )
+                        )
+                    } else {
                         //have to do this because file render will force 405 in response to POST
                         def file = new File("src/ratpack/assets/classifier-api/v1/_groups/${pathTokens.id}")
                         println "file ${file.absolutePath}"
