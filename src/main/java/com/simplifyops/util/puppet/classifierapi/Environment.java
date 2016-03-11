@@ -1,8 +1,11 @@
 package com.simplifyops.util.puppet.classifierapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Created by greg on 3/9/16.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Environment {
     private String name;
     private boolean sync_succeeded;

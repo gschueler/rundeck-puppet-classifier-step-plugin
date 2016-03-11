@@ -1,10 +1,13 @@
 package com.simplifyops.util.puppet.classifierapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Map;
 
 /**
  * Created by greg on 3/9/16.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class ClassifierClass {
     private String name;
     private String environment;

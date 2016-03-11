@@ -1,11 +1,14 @@
 package com.simplifyops.util.puppet.classifierapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by greg on 3/9/16.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Group {
     private String name;
     private String id;
